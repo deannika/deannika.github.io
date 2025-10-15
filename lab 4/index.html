@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My Store – Order</title>
+<style>
+body { font-family: Arial, Helvetica, sans-serif; margin: 2rem; line-height: 1.5; }
+.card { max-width: 720px; border: 1px solid #ddd; border-radius: 12px; padding: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+h1 { margin: 0 0 0.25rem 0; font-size: 2rem; color: #0056b3; }
+h2 { margin: 0.5rem 0 1rem 0; font-size: 1.3rem; color: #444; font-weight: 600; }
+.row { margin: 0.6rem 0; }
+.label { font-weight: bold; color: #222; }
+.small { color: #555; font-size: 1rem; }
+footer { margin-top: 2rem; color: #666; font-size: 0.9rem; }
+.hint { margin-top: 0.75rem; color: #333; font-size: 0.95rem; }
+</style>
+</head>
+<body>
+<div class="card">
+<h1 id="greeting">Hello, Thank you for visiting the website.</h1>
+<h2 id="thankyou">Thank you for ordering, see you soon!!!</h2>
+
+<div class="row"><span class="label">Customer:</span> <span id="custName">—</span></div>
+<div class="row"><span class="label">Shoe:</span> <span id="itemName">—</span></div>
+<div class="row"><span class="label">Quantity:</span> <span id="itemQty">—</span></div>
+<div class="row"><span class="label">Expected Arrival:</span> <span id="arrivalDate">—</span></div>
+
+<p class="hint small">If you want to place a new order, you can refresh the site.</p>
+</div>
+
+<footer>
+CSC 225 – Lab 4: Intro to JavaScript. This was a beginner code using <code>alert</code>, <code>prompt</code>, and simple Date math.
+</footer>
+
+<script>
+
+alert("Welcome to our selection. Please look and select what you want.");
+
+var name = prompt("What is your name?");
+if (name === null || name.trim() === "") {
+name = "Customer";
+}
+
+var item = prompt("What shoe would you like to buy?");
+if (item === null || item.trim() === "") {
+item = "Shoe"; 
+}
+
+var qty = prompt("How many would you like? (1-99)");
+var num = parseInt(qty, 10);
+while (isNaN(num) || num < 1 || num > 99) {
+qty = prompt("Please enter a valid number from 1 to 99:");
+if (qty === null) {
+num = 1;
+break;
+}
+num = parseInt(qty, 10);
+}
+
+var now = new Date();
+var hour = now.getHours();
+var partOfDay;
+if (hour < 12) {
+partOfDay = "Good morning";
+} else if (hour < 18) {
+partOfDay = "Good afternoon";
+} else {
+partOfDay = "Good evening";
+}
+
+var arrival = new Date(now.getTime());
+arrival.setDate(arrival.getDate() + 7);
+var arrivalText = arrival.toLocaleDateString();
+
+document.getElementById("greeting").innerText = partOfDay + ", " + name + "!";
+document.getElementById("thankyou").innerText = "Thank you for ordering, see you soon!!!";
+document.getElementById("custName").innerText = name;
+document.getElementById("itemName").innerText = item;
+document.getElementById("itemQty").innerText = String(num);
+document.getElementById("arrivalDate").innerText = arrivalText + " (7 days from today)";
+</script>
+</body>
+</html>
