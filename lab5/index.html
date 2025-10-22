@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IronPeak Gym — Membership Registration</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body { background: #0f172a; color: #e2e8f0; }
+    .brand { color: #22d3ee; }
+    .card { border-radius: 14px; }
+    .hero { background: linear-gradient(135deg, rgba(34,211,238,.15), rgba(99,102,241,.12)); border-radius: 16px; }
+    label { color: #cbd5e1; }
+    .footer-note { color: #94a3b8; font-size: .9rem; }
+  </style>
+</head>
+<body>
+  <div class="container py-5">
+    <div class="p-4 p-md-5 hero mb-4">
+      <h1 class="display-5 fw-bold">Iron<span class="brand">Peak</span> Gym</h1>
+      <p class="lead mb-0">Join our community and track your progress. Register below to activate your membership.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <div class="card bg-dark shadow-sm">
+          <div class="card-body">
+            <h2 class="h4 mb-3">Membership Registration</h2>
+            <form id="registrationForm" novalidate>
+              <div class="mb-3">
+                <label for="firstName" class="form-label">First Name</label>
+                <input type="text" class="form-control" id="firstName" placeholder="e.g., Jordan" />
+              </div>
+              <div class="mb-3">
+                <label for="lastName" class="form-label">Last Name</label>
+                <input type="text" class="form-control" id="lastName" placeholder="e.g., Nika" />
+              </div>
+              <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" placeholder="you@example.com" />
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" placeholder="Must include ! or ?" />
+                <div class="form-text text-info">Password must contain at least one <strong>!</strong> or <strong>?</strong>.</div>
+              </div>
+              <div class="mb-3">
+                <label for="dob" class="form-label">Date of Birth</label>
+                <input type="date" class="form-control" id="dob" />
+              </div>
+              <button type="submit" class="btn btn-info fw-semibold">Register</button>
+            </form>
+            <p class="mt-3 footer-note">By registering, you agree to IronPeak Gym's community guidelines and code of conduct.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="card bg-dark shadow-sm" id="resultCard" aria-live="polite" aria-atomic="true">
+          <div class="card-body">
+            <h2 class="h4 mb-3">Registration Status</h2>
+            <div id="resultArea" class="small text-secondary">Fill the form and click Register to see results here.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    function $(id) { return document.getElementById(id); }
+
+    function maskPassword(pw) {
+      var stars = "";
+      for (var i = 0; i < pw.length; i++) {
+        stars += "*";
+      }
+      return stars;
+    }
+
+    function buildAlert(kind, title, messages) {
+      var list = "";
+      if (messages && messages.length) {
+        list += "<ul class='mb-0'>";
+        for (var i = 0; i < messages.length; i++) {
+          list += "<li>" + messages[i] + "</li>";
+        }
+        list += "</ul>";
+      }
+      return (
+        "<div class='alert alert-" + kind + "' role='alert'>" +
+          "<div class='fw-semibold mb-1'>" + title + "</div>" +
+          list +
+        "</div>"
+      );
+    }
+
+    function renderUserSummary(user, maskedPw) {
+      var html = "";
+      html += "<div class='card bg-secondary-subtle text-dark'>";
+      html +=   "<div class='card-body'>";
+      html +=     "<h3 class='h5 mb-3'>Your Membership Details</h3>";
+      html +=     "<ul class='list-group list-group-flush'>";
+      html +=       "<li class='list-group-item bg-transparent'><strong>First Name:</strong> " + user.firstName + "</li>";
+      html +=       "<li class='list-group-item bg-transparent'><strong>Last Name:</strong> " + user.lastName + "</li>";
+      html +=       "<li class='list-group-item bg-transparent'><strong>Email:</strong> " + user.email + "</li>";
+      html +=       "<li class='list-group-item bg-transparent'><strong>Password:</strong> " + maskedPw + "</li>";
+      html +=       "<li class='list-group-item bg-transparent'><strong>Date of Birth:</strong> " + user.dob + "</li>";
+      html +=     "</ul>";
+      html +=   "</div>";
+      html += "</div>";
+      return html;
+    }
+
+    $("registrationForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      var firstName = $("firstName").value.trim();
+      var lastName  = $("lastName").value.trim();
+      var email     = $("email").value.trim();
+      var password  = $("password").value;
+      var dob       = $("dob").value.trim();
+
+      var errors = [];
+      if (!firstName || !lastName || !email || !password || !dob) {
+        errors.push("All fields must be present.");
+      }
+      var hasRequiredSpecial = /[!?]/.test(password);
+      if (!hasRequiredSpecial) {
+        errors.push("Password must contain ! or ?.");
+      }
+
+      var resultArea = $("resultArea");
+
+      if (errors.length > 0) {
+        resultArea.innerHTML = buildAlert("danger", "Registration Failed", errors);
+        return;
+      }
+
+      var user = {
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: password,
+        dob: dob
+      };
+
+      var masked = maskPassword(user.password);
+
+      var output = "";
+      output += buildAlert("success", "Registration Successful", []);
+      output += renderUserSummary(user, masked);
+
+      resultArea.innerHTML = output;
+    });
+  </script>
+</body>
+</html>
