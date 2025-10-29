@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CSC 225 – Lab 6: Consuming a REST API</title>
+<style>
+:root { --maxw: 920px; }
+body { font-family: Arial, Helvetica, sans-serif; margin: 2rem; line-height: 1.5; }
+.container { max-width: var(--maxw); margin: 0 auto; }
+h1 { margin: 0 0 0.5rem; }
+p.lead { margin: 0 0 1rem; color: #444; }
+.actions { display: flex; gap: .75rem; align-items: center; margin: 1rem 0 1.25rem; }
+button { cursor: pointer; border: 0; background: #0d6efd; color: #fff; padding: .6rem .9rem; border-radius: .5rem; font-size: 1rem; }
+button:active { transform: translateY(1px); }
+img { display:block; max-width:100%; height:auto; border-radius: .75rem; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+figure { margin: 0 0 1rem; }
+figcaption { font-size: .9rem; color:#555; margin-top: .4rem; }
+table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+thead th { text-align: left; background:#f5f7fb; }
+th, td { padding: .65rem .7rem; border-bottom: 1px solid #e9eef5; vertical-align: top; }
+.muted { color: #555; }
+.status { font-size: .9rem; color: #444; }
+.error { color: #b00020; font-weight: 600; }
+.sr-only { position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>Lab 6 – Consuming a REST API</h1>
+<p class="lead">Click the button to GET data from <code>https://brianobruno.github.io/cats.json</code>, sort by <em>factId</em>, render the table, and update the photo below using the image URL returned by the API.</p>
+</header>
+
+
+<figure>
+<img id="catPhoto" src="myphoto.jpg" alt="Cat placeholder that will be replaced after API call" />
+<figcaption class="muted">This photo will be replaced with the image URL from the API response.</figcaption>
+</figure>
+
+
+<div class="actions">
+<button id="loadBtn" type="button">Load Cat Facts (GET)</button>
+<span id="status" class="status" aria-live="polite"></span>
+</div>
+
+
+<table aria-describedby="tableDesc">
+<caption id="tableDesc" class="sr-only">Table of cat facts sorted by factId ascending</caption>
+<thead>
+<tr>
+<th scope="col">factId</th>
+<th scope="col">fact</th>
+</tr>
+</thead>
+<tbody id="factsBody">
+<tr><td colspan="2" class="muted">Click "Load Cat Facts (GET)" to populate this table.</td></tr>
+</tbody>
+</table>
+</div>
+
+
+<script>
+(function () {
+const btn = document.getElementById('loadBtn');
+const status = document.getElementById('status');
+const img = document.getElementById('catPhoto');
+const tbody = document.getElementById('factsBody');
+const API_URL = 'https://brianobruno.github.io/cats.json';
+
+
+function setStatus(msg, isError) {
+status.textContent = msg || '';
+status.className = 'status' + (isError ? ' error' : '');
+}
+
+
+function looksLikeImageUrl(value) {
+return typeof value === 'string' && /^(https?:)\/\/\S+\.(png|jpg|jpeg|gif|webp)(\?\S+)?$/i.test(value);
+}
+
+
+function extractImageUrl(payload) {
+const candidates = ['image', 'img', 'photo', 'picture', 'url'];
+for (const key of candidates) {
+if (looksLikeImageUrl(payload[key])) return payload[key];
+}
+for (const val of Object.values(payload)) {
+</html>
