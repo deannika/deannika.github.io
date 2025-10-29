@@ -6,7 +6,7 @@
 <title>CSC 225 – Lab 6: Consuming a REST API</title>
 <style>
 :root { --maxw: 920px; }
-body { font-family: Arial, Helvetica, sans-serif; margin: 2rem; line-height: 1.5; }
+body { font-family: Bahnschrift, "Segoe UI", Arial, Helvetica, sans-serif; margin: 2rem; line-height: 1.5; }
 .container { max-width: var(--maxw); margin: 0 auto; }
 h1 { margin: 0 0 0.5rem; }
 p.lead { margin: 0 0 1rem; color: #444; }
@@ -29,21 +29,18 @@ th, td { padding: .65rem .7rem; border-bottom: 1px solid #e9eef5; vertical-align
 <div class="container">
 <header>
 <h1>Lab 6 – Consuming a REST API</h1>
-<p class="lead">Click the button to GET data from <code>https://brianobruno.github.io/cats.json</code>, sort by <em>factId</em>, render the table, and update the photo below using the image URL returned by the API.</p>
+<p class="lead">When you click this button, an image will appear and facts will pop up!</p>
 </header>
 
-
 <figure>
-<img id="catPhoto" src="myphoto.jpg" alt="Cat placeholder that will be replaced after API call" />
-<figcaption class="muted">This photo will be replaced with the image URL from the API response.</figcaption>
+<img id="catPhoto" src="myphoto.jpg" alt="Original image before API call" />
+<figcaption class="muted">I wonder what this will turn into?</figcaption>
 </figure>
 
-
 <div class="actions">
-<button id="loadBtn" type="button">Load Cat Facts (GET)</button>
+<button id="loadBtn" type="button">Press for a surprise</button>
 <span id="status" class="status" aria-live="polite"></span>
 </div>
-
 
 <table aria-describedby="tableDesc">
 <caption id="tableDesc" class="sr-only">Table of cat facts sorted by factId ascending</caption>
@@ -54,36 +51,90 @@ th, td { padding: .65rem .7rem; border-bottom: 1px solid #e9eef5; vertical-align
 </tr>
 </thead>
 <tbody id="factsBody">
-<tr><td colspan="2" class="muted">Click "Load Cat Facts (GET)" to populate this table.</td></tr>
+<tr><td colspan="2" class="muted">Click "Press for a surprise" to populate this table.</td></tr>
 </tbody>
 </table>
 </div>
 
-
 <script>
 (function () {
-const btn = document.getElementById('loadBtn');
-const status = document.getElementById('status');
-const img = document.getElementById('catPhoto');
-const tbody = document.getElementById('factsBody');
-const API_URL = 'https://brianobruno.github.io/cats.json';
+  const btn = document.getElementById('loadBtn');
+  const status = document.getElementById('status');
+  const img = document.getElementById('catPhoto');
+  const tbody = document.getElementById('factsBody');
+  const API_URL = 'https://brianobruno.github.io/cats.json';
 
+  function setStatus(msg, isError) {
+    status.textContent = msg || '';
+    status.className = 'status' + (isError ? ' error' : '');
+  }
 
-function setStatus(msg, isError) {
-status.textContent = msg || '';
-status.className = 'status' + (isError ? ' error' : '');
-}
+  function looksLikeImageUrl(value) {
+    return typeof value === 'string' && /^(https?:)\/\/\S+\.(png|jpg|jpeg|gif|webp)(\?\S+)?$/i.test(value);
+  }
 
+  function extractImageUrl(payload) {
+    const candidates = ['catPhoto', 'image', 'img', 'photo', 'picture', 'url'];
+    for (const key of candidates) {
+      if (looksLikeImageUrl(payload && payload[key])) return payload[key];
+    }
+    for (const val of Object.values(payload || {})) {
+      if (looksLikeImageUrl(val)) return val;
+    }
+    return null;
+  }
 
-function looksLikeImageUrl(value) {
-return typeof value === 'string' && /^(https?:)\/\/\S+\.(png|jpg|jpeg|gif|webp)(\?\S+)?$/i.test(value);
-}
+  function extractFacts(payload) {
+    if (Array.isArray(payload)) return payload;
+    if (Array.isArray(payload.facts)) return payload.facts;
+    for (const val of Object.values(payload || {})) {
+      if (Array.isArray(val) && val.length && typeof val[0] === 'object') {
+        const item = val[0];
+        if (('factId' in item) && ('fact' in item || 'text' in item)) return val;
+      }
+    }
+    return [];
+  }
 
+  async function handleClick() {
+    setStatus('Fetching…');
+    try {
+      const res = await fetch(API_URL, { method: 'GET', headers: { 'Accept': 'application/json' } });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
 
-function extractImageUrl(payload) {
-const candidates = ['image', 'img', 'photo', 'picture', 'url'];
-for (const key of candidates) {
-if (looksLikeImageUrl(payload[key])) return payload[key];
-}
-for (const val of Object.values(payload)) {
+      const imgUrl = extractImageUrl(data);
+      if (imgUrl) {
+        img.src = imgUrl;
+      }
+
+      const facts = extractFacts(data).slice();
+      facts.sort((a, b) => Number(a.factId) - Number(b.factId));
+
+      tbody.innerHTML = '';
+      if (facts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="2" class="muted">No facts found in API response.</td></tr>';
+      } else {
+        for (const item of facts) {
+          const tr = document.createElement('tr');
+          const tdId = document.createElement('td');
+          const tdFact = document.createElement('td');
+          tdId.textContent = item.factId;
+          tdFact.textContent = (item.fact ?? item.text);
+          tr.append(tdId, tdFact);
+          tbody.appendChild(tr);
+        }
+      }
+
+      setStatus('Loaded successfully.');
+    } catch (err) {
+      console.error(err);
+      setStatus('Failed to load data: ' + err.message, true);
+    }
+  }
+
+  btn.addEventListener('click', handleClick);
+})();
+</script>
+</body>
 </html>
