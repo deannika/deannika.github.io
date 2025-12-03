@@ -1,3 +1,16 @@
+//   PREVENT SCRIPT FROM RUNNING TWICE
+if (window.scriptAlreadyLoaded) {
+    console.log("Script already executed — stopping duplicate run.");
+    return;
+}
+window.scriptAlreadyLoaded = true;
+
+if (window.makesLoaded) {
+    console.log("loadMakes() already ran — skipping second call.");
+    return;
+}
+window.makesLoaded = true;
+
 // Load all car makes into the dropdown on index.html
 async function loadMakes() {
     var dropdown = document.getElementById("makeDropdown");
