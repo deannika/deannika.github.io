@@ -1,66 +1,73 @@
-// REAL 2024 CAR MAKES (FILTERED)
-const realMakes2024 = [
-    "ACURA", "ALFA ROMEO", "AUDI", "BMW", "BUICK", "CADILLAC",
-    "CHEVROLET", "CHRYSLER", "DODGE", "FERRARI", "FIAT", "FORD",
-    "GENESIS", "GMC", "HONDA", "HYUNDAI", "INFINITI", "JAGUAR",
-    "JEEP", "KIA", "LAMBORGHINI", "LAND ROVER", "LEXUS", "LINCOLN",
-    "MASERATI", "MAZDA", "MERCEDES-BENZ", "MINI", "MITSUBISHI",
-    "NISSAN", "PORSCHE", "RAM", "SUBARU", "TESLA", "TOYOTA",
-    "VOLKSWAGEN", "VOLVO"
-];
+// GET 2024 MAKES (FILTERED)
 
-// LOAD MAKES (FILTER + API)
 async function loadMakes() {
     var dropdown = document.getElementById("makeDropdown");
     var message = document.getElementById("makeMessage");
 
-    if (!dropdown) return;
+    if (!dropdown) return; // safety for models.html
 
-    dropdown.innerHTML = "<option>Loading makes...</option>";
+    dropdown.innerHTML = "<option>Loading...</option>";
     if (message) message.innerHTML = "";
 
     try {
-        var url = "https://vpic.nhtsa.dot.gov/api/vehicles/GetMakesForVehicleType/passenger%20car?format=json";
-
+        var url = "https://vpic.nhtsa.dot.gov/api/vehicles/getallmakes?format=json";
         var response = await fetch(url);
         var data = await response.json();
+
         var results = data.Results;
 
-        dropdown.innerHTML = "<option value=''>-- Select a Make --</option>";
+        // List of REAL modern brands (filtered for 2024)
+        var modernMakes = [
+            "ACURA","ALFA ROMEO","ASTON MARTIN","AUDI","BENTLEY","BMW","BUICK",
+            "CADILLAC","CHEVROLET","CHRYSLER","DODGE","FERRARI","FIAT",
+            "FORD","GENESIS","GMC","HONDA","HYUNDAI","INFINITI","JAGUAR",
+            "JEEP","KIA","LAMBORGHINI","LAND ROVER","LEXUS","LINCOLN",
+            "LOTUS","LUCID","MASERATI","MAZDA","MCLAREN","MERCEDES-BENZ",
+            "MINI","MITSUBISHI","NISSAN","POLESTAR","PORSCHE","RAM",
+            "RANGE ROVER","ROLLS-ROYCE","SUBARU","TESLA","TOYOTA","VOLKSWAGEN",
+            "VOLVO"
+        ];
 
-        let count = 0;
+        // Clear dropdown and insert filtered makes
+        dropdown.innerHTML = "<option value=''>-- Select Make --</option>";
 
         for (var i = 0; i < results.length; i++) {
-            var name = results[i].MakeName.toUpperCase();
+            var makeName = results[i].Make_Name.toUpperCase();
 
-            if (realMakes2024.includes(name)) {
-                dropdown.innerHTML += `<option value="${name}">${name}</option>`;
-                count++;
+            // If it's a modern 2024 brand
+            for (var j = 0; j < modernMakes.length; j++) {
+                if (makeName === modernMakes[j]) {
+                    dropdown.innerHTML +=
+                        "<option value='" + makeName + "'>" + makeName + "</option>";
+                }
             }
         }
 
-        message.innerHTML = "Loaded " + count + " modern car makes.";
+        if (message)
+            message.innerHTML = "Loaded " + dropdown.options.length + " modern 2024 makes.";
 
     } catch (err) {
-        dropdown.innerHTML = "<option>Error loading makes</option>";
-        if (message) message.innerHTML = "Could not load makes.";
+        if (message) message.innerHTML = "Error loading makes.";
+        console.log(err);
     }
 }
 
 // GO TO MODELS PAGE
+
 function goToModels() {
     var dropdown = document.getElementById("makeDropdown");
     var make = dropdown.value;
 
     if (make === "") {
-        alert("Please select a make.");
+        alert("Please select a make first.");
         return;
     }
 
-    window.location.href = "models.html?make=" + encodeURIComponent(make);
-}
+    window.location.href = "models.html?make=" + make;
+} 
 
-// LOAD MODELS PAGE
+// LOAD ONLY 2024 MODELS
+
 async function loadModels() {
     var params = new URLSearchParams(window.location.search);
     var make = params.get("make");
@@ -74,29 +81,38 @@ async function loadModels() {
         return;
     }
 
-    title.innerHTML = "Models for: " + make;
+    title.innerHTML = "Models for: " + make + " (2024)";
+    tableBody.innerHTML = "";
+    if (message) message.innerHTML = "Loading 2024 models...";
 
     try {
-        var url = "https://vpic.nhtsa.dot.gov/api/vehicles/getmodelsformmake/" + make + "?format=json";
+        // 🔥 **This endpoint ONLY returns 2024 models**
+        var url =
+            "https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMakeYear/make/" +
+            make +
+            "/modelyear/2024?format=json";
+
         var response = await fetch(url);
         var data = await response.json();
-
         var results = data.Results;
 
-        tableBody.innerHTML = "";
-
+        // Fill table
         for (var i = 0; i < results.length; i++) {
+            var m = results[i];
+
             tableBody.innerHTML +=
-                `<tr>
-                    <td>${results[i].Model_Name}</td>
-                    <td>${results[i].Model_ID}</td>
-                    <td>${results[i].Make_ID}</td>
-                </tr>`;
+                "<tr>" +
+                "<td>" + m.Model_Name + "</td>" +
+                "<td>" + m.Model_ID + "</td>" +
+                "<td>" + m.Make_ID + "</td>" +
+                "</tr>";
         }
 
-        message.innerHTML = "Found " + results.length + " models.";
+        if (message)
+            message.innerHTML = "Found " + results.length + " models.";
 
     } catch (err) {
-        message.innerHTML = "Error loading models.";
+        console.log(err);
+        if (message) message.innerHTML = "Error loading models.";
     }
 }
