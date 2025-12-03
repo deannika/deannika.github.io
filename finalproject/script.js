@@ -1,228 +1,232 @@
 // load all the makes (brands) into the dropdown
 async function loadCarBrands() {
+    var dropdown = document.getElementById("makeDropdown");
+    var message = document.getElementById("makeMessage");
 
-    let dd = document.getElementById("makeDropdown");
-    let msg = document.getElementById("makeMessage");
+    if (!dropdown) return;
 
-    if (!dd) return;
-
-    dd.innerHTML = "<option>Loading...</option>";
-    if (msg) msg.textContent = "";
-
-    // just my personal “allowed” brands list (kept same)
-    const okList = [
-        "ACURA","ALFA ROMEO","ASTON MARTIN","AUDI","BENTLEY","BMW","BUICK",
-        "CADILLAC","CHEVROLET","CHRYSLER","DODGE","FERRARI","FIAT",
-        "FORD","GENESIS","GMC","HONDA","HYUNDAI","INFINITI","JAGUAR",
-        "JEEP","KIA","LAMBORGHINI","LAND ROVER","LEXUS","LINCOLN",
-        "LOTUS","LUCID","MASERATI","MAZDA","MCLAREN","MERCEDES-BENZ",
-        "MINI","MITSUBISHI","NISSAN","POLESTAR","PORSCHE","RAM",
-        "RANGE ROVER","ROLLS-ROYCE","SUBARU","TESLA","TOYOTA","VOLKSWAGEN",
-        "VOLVO"
-    ];
+    dropdown.innerHTML = "<option>Loading...</option>";
+    if (message) message.innerHTML = "";
 
     try {
-        // basic fetch
-        let api = "https://vpic.nhtsa.dot.gov/api/vehicles/getallmakes?format=json";
-        let r = await fetch(api);
-        let j = await r.json();
+        var url = "https://vpic.nhtsa.dot.gov/api/vehicles/getallmakes?format=json";
+        var response = await fetch(url);
+        var data = await response.json();
 
-        let lst = j.Results;   // original list
-        dd.innerHTML = "<option value=''>-- Select Make --</option>";
+        var results = data.Results;
 
-        let total = 0;
+        var modernMakes = [
+            "ACURA","ALFA ROMEO","ASTON MARTIN","AUDI","BENTLEY","BMW","BUICK",
+            "CADILLAC","CHEVROLET","CHRYSLER","DODGE","FERRARI","FIAT",
+            "FORD","GENESIS","GMC","HONDA","HYUNDAI","INFINITI","JAGUAR",
+            "JEEP","KIA","LAMBORGHINI","LAND ROVER","LEXUS","LINCOLN",
+            "LOTUS","LUCID","MASERATI","MAZDA","MCLAREN","MERCEDES-BENZ",
+            "MINI","MITSUBISHI","NISSAN","POLESTAR","PORSCHE","RAM",
+            "RANGE ROVER","ROLLS-ROYCE","SUBARU","TESLA","TOYOTA","VOLKSWAGEN",
+            "VOLVO"
+        ];
 
-        // loop through all results and check if they match allowed brands
-        for (let i = 0; i < lst.length; i++) {
-            let nm = (lst[i].Make_Name || "").toUpperCase();
+        dropdown.innerHTML = "<option value=''>-- Select Make --</option>";
 
-            // quick check through okList
-            if (okList.indexOf(nm) !== -1) {
-                // adding option the “old school” way
-                dd.innerHTML += "<option value='" + nm + "'>" + nm + "</option>";
-                total++;
+        var count = 0;
+
+        for (var i = 0; i < results.length; i++) {
+            var makeName = results[i].Make_Name.toUpperCase();
+
+            for (var j = 0; j < modernMakes.length; j++) {
+                if (makeName === modernMakes[j]) {
+                    dropdown.innerHTML +=
+                        "<option value='" + makeName + "'>" + makeName + "</option>";
+                    count++;
+                    break;
+                }
             }
         }
 
-        if (msg) msg.textContent = "Loaded " + total + " brands.";
+        if (message) {
+            message.innerHTML = "Loaded " + count + " modern car makes.";
+        }
 
     } catch (err) {
-        console.log("failed brands:", err);
-        dd.innerHTML = "<option>Error</option>";
-        if (msg) msg.textContent = "Couldn't load car makes.";
+        console.log(err);
+        dropdown.innerHTML = "<option>Error loading makes</option>";
+        if (message) message.innerHTML = "Could not load car makes.";
     }
 }
 
 
 // go to the models page
 function goPickModels() {
-    let dd = document.getElementById("makeDropdown");
-    if (!dd) return;
+    var dropdown = document.getElementById("makeDropdown");
+    if (!dropdown) return;
 
-    let v = dd.value;
+    var make = dropdown.value;
 
-    if (!v) {
-        alert("Pick something first.");
+    if (make === "") {
+        alert("Please select a make first.");
         return;
     }
 
-    // direct move to the page
-    window.location = "models.html?make=" + encodeURIComponent(v);
+    window.location.href = "models.html?make=" + make;
 }
 
 
 
-// --------------- Models Page Stuff --------------------
-
-let modelBuffer = [];   // stores current model results
-let nameAsc = true;
-let idAsc = true;
-let makeIdAsc = true;
+var currentModels = [];
+var sortNameAsc = true;
+var sortIdAsc = true;
+var sortMakeIdAsc = true;
 
 
-// rebuilds the model table each time
-function drawModels(arr) {
-    let t = document.getElementById("modelsTable");
-    if (!t) return;
+// rebuilds the model table
+function drawModels(list) {
+    var tableBody = document.getElementById("modelsTable");
+    if (!tableBody) return;
 
-    t.innerHTML = "";
+    tableBody.innerHTML = "";
 
-    for (let i = 0; i < arr.length; i++) {
-        let m = arr[i];
-        let nm = m.Model_Name || "N/A";
-        let mid = m.Model_ID || "N/A";
-        let mkid = m.Make_ID || "N/A";
+    for (var i = 0; i < list.length; i++) {
+        var m = list[i];
 
-        t.innerHTML += `
-            <tr>
-                <td>${nm}</td>
-                <td>${mid}</td>
-                <td>${mkid}</td>
-            </tr>
-        `;
+        var modelName = m.Model_Name || "N/A";
+        var modelId = m.Model_ID || "N/A";
+        var makeId = m.Make_ID || "N/A";
+
+        tableBody.innerHTML +=
+            "<tr>" +
+                "<td>" + modelName + "</td>" +
+                "<td>" + modelId + "</td>" +
+                "<td>" + makeId + "</td>" +
+            "</tr>";
     }
 }
 
 
 
-// load the models for the chosen make
-async function loadModels() {
+// load the car models
+async function loadCarModels() {
+    var params = new URLSearchParams(window.location.search);
+    var make = params.get("make");
 
-    let q = new URLSearchParams(window.location.search);
-    let mk = q.get("make");
+    var title = document.getElementById("makeTitle");
+    var message = document.getElementById("modelsMessage");
 
-    let header = document.getElementById("makeTitle");
-    let msg = document.getElementById("modelsMessage");
-
-    if (!mk) {
-        if (header) header.textContent = "No make selected.";
+    if (!make) {
+        if (title) title.innerHTML = "No make selected.";
         return;
     }
 
-    if (header) header.textContent = "Current Models for: " + mk;
-    if (msg) msg.textContent = "Loading...";
+    if (title) {
+        title.innerHTML = "Current Models for: " + make;
+    }
+
+    if (message) {
+        message.innerHTML = "Loading models...";
+    }
 
     try {
-        // attempt with year 2024 first
-        let url1 = "https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMakeYear/make/" +
-                    mk + "/modelyear/2024?format=json";
+        var url2024 =
+            "https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMakeYear/make/" +
+            make + "/modelyear/2024?format=json";
 
-        let r1 = await fetch(url1);
-        let j1 = await r1.json();
+        var response2024 = await fetch(url2024);
+        var data2024 = await response2024.json();
+        var results = data2024.Results;
 
-        let arr = j1.Results;
+        if (results.length === 0) {
+            var fallbackUrl =
+                "https://vpic.nhtsa.dot.gov/api/vehicles/getmodelsformmake/" +
+                make + "?format=json";
 
-        // fallback to generic endpoint
-        if (!arr || arr.length === 0) {
-            let fallback = "https://vpic.nhtsa.dot.gov/api/vehicles/getmodelsformake/" +
-                           mk + "?format=json";
-
-            let r2 = await fetch(fallback);
-            let j2 = await r2.json();
-            arr = j2.Results;
+            var fallbackResponse = await fetch(fallbackUrl);
+            var fallbackData = await fallbackResponse.json();
+            results = fallbackData.Results;
         }
 
-        modelBuffer = arr;     // save results
-        drawModels(arr);       // initial draw
+        currentModels = results;
+        drawModels(currentModels);
 
-        if (msg) msg.textContent = "Found " + arr.length + " models.";
+        if (message) {
+            message.innerHTML = "Found " + currentModels.length + " models.";
+        }
 
-    } catch (e) {
-        console.log("model load error:", e);
-        if (msg) msg.textContent = "Error loading models.";
+    } catch (err) {
+        console.log(err);
+        if (message) message.innerHTML = "Error loading models.";
     }
 }
 
 
 
-// search bar filtering
-function filterModels() {
-    let box = document.getElementById("modelSearch");
-    let msg = document.getElementById("modelsMessage");
-    if (!box) return;
+// search bar
+function searchModels() {
+    var input = document.getElementById("modelSearch");
+    var message = document.getElementById("modelsMessage");
+    if (!input) return;
 
-    let term = box.value.toLowerCase();
-    let out = [];
+    var term = input.value.toLowerCase();
+    var filtered = [];
+    var total = currentModels.length;
 
-    for (let i = 0; i < modelBuffer.length; i++) {
-        let nm = (modelBuffer[i].Model_Name || "").toLowerCase();
-        if (nm.indexOf(term) !== -1) {
-            out.push(modelBuffer[i]);
+    for (var i = 0; i < currentModels.length; i++) {
+        var name = currentModels[i].Model_Name || "";
+        if (name.toLowerCase().indexOf(term) !== -1) {
+            filtered.push(currentModels[i]);
         }
     }
 
-    drawModels(out);
+    drawModels(filtered);
 
-    if (msg) {
-        msg.textContent = "Showing " + out.length + " of " + modelBuffer.length + " models.";
+    if (message) {
+        message.innerHTML = "Showing " + filtered.length + " of " + total + " models.";
     }
 }
 
 
 
 // sorting
-function sortModels(field) {
-
-    if (modelBuffer.length === 0) return;
+function sortModelList(field) {
+    if (currentModels.length === 0) return;
 
     if (field === "name") {
-        modelBuffer.sort(function(a, b) {
-            let av = (a.Model_Name || "").toLowerCase();
-            let bv = (b.Model_Name || "").toLowerCase();
-            if (av < bv) return nameAsc ? -1 : 1;
-            if (av > bv) return nameAsc ? 1 : -1;
+        currentModels.sort(function(a, b) {
+            var av = (a.Model_Name || "").toLowerCase();
+            var bv = (b.Model_Name || "").toLowerCase();
+            if (av < bv) return sortNameAsc ? -1 : 1;
+            if (av > bv) return sortNameAsc ? 1 : -1;
             return 0;
         });
-        nameAsc = !nameAsc;
+        sortNameAsc = !sortNameAsc;
     }
 
     else if (field === "id") {
-        modelBuffer.sort(function(a, b) {
-            let av = Number(a.Model_ID) || 0;
-            let bv = Number(b.Model_ID) || 0;
-            if (av < bv) return idAsc ? -1 : 1;
-            if (av > bv) return idAsc ? 1 : -1;
+        currentModels.sort(function(a, b) {
+            var av = Number(a.Model_ID) || 0;
+            var bv = Number(b.Model_ID) || 0;
+            if (av < bv) return sortIdAsc ? -1 : 1;
+            if (av > bv) return sortIdAsc ? 1 : -1;
             return 0;
         });
-        idAsc = !idAsc;
+        sortIdAsc = !sortIdAsc;
     }
 
     else if (field === "makeid") {
-        modelBuffer.sort(function(a, b) {
-            let av = Number(a.Make_ID) || 0;
-            let bv = Number(b.Make_ID) || 0;
-            if (av < bv) return makeIdAsc ? -1 : 1;
-            if (av > bv) return makeIdAsc ? 1 : -1;
+        currentModels.sort(function(a, b) {
+            var av = Number(a.Make_ID) || 0;
+            var bv = Number(b.Make_ID) || 0;
+            if (av < bv) return sortMakeIdAsc ? -1 : 1;
+            if (av > bv) return sortMakeIdAsc ? 1 : -1;
             return 0;
         });
-        makeIdAsc = !makeIdAsc;
+        sortMakeIdAsc = !sortMakeIdAsc;
     }
 
-    filterModels();  // reapply current search if any
+    searchModels();
 }
 
 
-// quick scroll to top
-function scrollToTop() {
+
+// scroll back to top
+function goBackToTop() {
     window.scrollTo(0, 0);
 }
