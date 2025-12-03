@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Car Make Explorer</title>
+
+    <!-- Bootstrap CSS from CDN -->
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <style>
+        body {
+            background-color: #0a1a2f; /* dark navy */
+            color: #ffffff;
+        }
+
+        .page-wrapper {
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+
+        .panel-box {
+            background-color: #ffffff;
+            color: #333333;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.4);
+        }
+
+        .header-title {
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .label-text {
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .footer-text {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #dddddd;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container page-wrapper">
+
+    <div class="row">
+        <!-- Left side: title + instructions -->
+        <div class="col-md-6 col-sm-12">
+            <h1 class="header-title">Car Make Explorer</h1>
+            <p class="subtitle">
+                This page uses a public car API from NHTSA to load a list of vehicle
+                manufacturers. Pick a make on the right and then click
+                <strong>View Models</strong> to see all models for that brand.
+            </p>
+
+            <ul>
+                <li>Uses a REST API with JSON data.</li>
+                <li>HTML, Bootstrap, and vanilla JavaScript.</li>
+                <li>Responsive layout for phones, tablets, and desktops.</li>
+            </ul>
+
+            <p class="footer-text">
+                Tip: If the list does not load, check your internet connection and refresh the page.
+            </p>
+        </div>
+
+        <!-- Right side: dropdown + button in a white card -->
+        <div class="col-md-6 col-sm-12">
+            <div class="panel-box">
+                <h3 class="text-center">Select a Car Make</h3>
+
+                <label for="makeDropdown" class="label-text">Car Make:</label>
+                <select id="makeDropdown" class="form-control">
+                    <option>Loading makes...</option>
+                </select>
+
+                <button class="btn btn-primary btn-block" style="margin-top: 15px;"
+                        onclick="goToModels()">
+                    View Models
+                </button>
+
+                <p id="makeMessage" style="margin-top: 10px; font-size: 13px;"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+    // load the list of makes when the page opens
+    loadMakes();
+</script>
+
+</body>
+</html>
