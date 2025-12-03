@@ -3,20 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2024 Models</title>
+    <title>New Car Finder - Models</title>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 
     <style>
         body {
-            background: #0d1b2a;
-            color: white;
+            background-color: #0d1b2a;
+            color: #ffffff;
             font-family: Arial, sans-serif;
         }
-        .card {
-            background: #1b263b;
+
+        .card-box {
+            background-color: #1b263b;
             border-radius: 10px;
             padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        h2, p, label {
+            color: #ffffff;
+        }
+
+        .btn-primary {
+            background-color: #1f6feb;
+            border: none;
+            border-radius: 20px;
+            transition: 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #1158c7;
+            opacity: 0.95;
+        }
+
+        .back-btn {
+            margin-top: 15px;
+        }
+
+        .table thead th {
+            cursor: pointer;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            text-align: center;
+            line-height: 38px;
+            font-size: 20px;
+        }
+
+        #modelsMessage {
+            font-size: 13px;
+            color: #cfd6e6;
         }
     </style>
 </head>
@@ -24,27 +70,50 @@
 <body onload="loadModels()">
 
     <div class="container mt-4">
-        <h2 id="makeTitle" class="text-center mb-4">Loading...</h2>
+        <h2 id="makeTitle" class="text-center">Current Models</h2>
 
-        <div class="card">
-            <p id="modelsMessage"></p>
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-sm-12">
+                <div class="card-box">
 
-            <table class="table table-dark table-striped">
-                <thead>
-                    <tr>
-                        <th>Model Name</th>
-                        <th>Model ID</th>
-                        <th>Make ID</th>
-                    </tr>
-                </thead>
-                <tbody id="modelsTable"></tbody>
-            </table>
-        </div>
+                    <p id="modelsMessage"></p>
 
-        <div class="text-center mt-3">
-            <a href="index.html" class="btn btn-primary">Back</a>
+                    <div class="mb-3">
+                        <input type="text"
+                               id="modelSearch"
+                               class="form-control"
+                               placeholder="Search models..."
+                               onkeyup="filterModels()">
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-dark table-striped">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortModels('name')">Model Name</th>
+                                    <th onclick="sortModels('id')">Model ID</th>
+                                    <th onclick="sortModels('makeid')">Make ID</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modelsTable">
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <a href="index.html" class="btn btn-primary back-btn">Back to New Car Finder</a>
+
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- Back to top button -->
+    <button type="button"
+            class="btn btn-primary back-to-top"
+            onclick="scrollToTop()">
+        ↑
+    </button>
 
     <script src="script.js"></script>
 </body>
