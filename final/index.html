@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Make Explorer</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- Jumbotron Section -->
+        <div class="jumbotron text-center" style="margin-top: 20px;">
+            <h1> Car Make Explorer</h1>
+            <p>Find a vehicle brand and explore its models.</p>
+        </div>
+
+        <!-- Make Selection -->
+        <div class="text-center">
+            <h2>Select a Car Make</h2>
+
+            <select id="makeDropdown" class="form-control" style="max-width: 300px; margin: 0 auto; margin-bottom: 20px;">
+                <option>Loading...</option>
+            </select>
+
+            <button class="btn btn-primary" onclick="goToModels()">View Models</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+    <script>
+        loadMakes();
+    </script>
+
+</body>
+</html>
