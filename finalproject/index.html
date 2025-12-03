@@ -1,81 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Car Finder</title>
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-
-    <style>
-        body {
-            background-color: #0d1b2a;  /* dark blue */
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-        }
-
-        .card-box {
-            background-color: #1b263b;
-            border-radius: 10px;
-            padding: 25px;
-            margin-top: 40px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-        }
-
-        h2, h4, p, label {
-            color: #ffffff;
-        }
-
-        .btn-primary {
-            background-color: #1f6feb;
-            border: none;
-            border-radius: 20px;
-            transition: 0.2s;
-        }
-
-        .btn-primary:hover {
-            background-color: #1158c7;
-            opacity: 0.95;
-        }
-
-        #makeMessage {
-            margin-top: 10px;
-            font-size: 13px;
-            color: #cfd6e6;
-        }
-    </style>
+    <title>Pick a Car Brand</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 </head>
 
-<body onload="loadMakes()">
+<body onload="loadCarBrands()">
 
-    <div class="container mt-4">
-        <h2 class="text-center">New Car Finder</h2>
+<div class="container" style="margin-top:30px;">
 
-        <div class="row justify-content-center mt-4">
-            <div class="col-md-6 col-sm-10">
-                <div class="card-box text-center">
+    <h2 style="margin-bottom:20px;">Choose a Car Brand</h2>
 
-                    <h4>Select a Car Make</h4>
-                    <p>Choose any car manufacturer and find all of their current models.</p>
-
-                    <select id="makeDropdown" class="form-select mb-3">
-                        <option>Loading...</option>
-                    </select>
-
-                    <button class="btn btn-primary w-100"
-                            onclick="goToModels()">
-                        View Models
-                    </button>
-
-                    <p id="makeMessage"></p>
-
-                </div>
-            </div>
-        </div>
+    <!-- dropdown area -->
+    <div class="mb-3">
+        <select id="makeDropdown" class="form-select">
+            <option>Loading...</option>
+        </select>
     </div>
 
-    <script src="script.js"></script>
+    <button class="btn btn-primary" onclick="goPickModels()">See Models</button>
+
+    <p id="makeMessage" style="margin-top:15px;color:#c00;"></p>
+
+</div>
+
+<script src="script.js"></script>
+
 </body>
 </html>
