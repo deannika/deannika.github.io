@@ -1,10 +1,11 @@
-// GET 2024 MAKES (FILTERED)
+
+// LOAD FILTERED 2024 MAKES
 
 async function loadMakes() {
     var dropdown = document.getElementById("makeDropdown");
     var message = document.getElementById("makeMessage");
 
-    if (!dropdown) return; // safety for models.html
+    if (!dropdown) return;
 
     dropdown.innerHTML = "<option>Loading...</option>";
     if (message) message.innerHTML = "";
@@ -16,7 +17,7 @@ async function loadMakes() {
 
         var results = data.Results;
 
-        // List of REAL modern brands (filtered for 2024)
+        // Modern makes (clean)
         var modernMakes = [
             "ACURA","ALFA ROMEO","ASTON MARTIN","AUDI","BENTLEY","BMW","BUICK",
             "CADILLAC","CHEVROLET","CHRYSLER","DODGE","FERRARI","FIAT",
@@ -28,45 +29,43 @@ async function loadMakes() {
             "VOLVO"
         ];
 
-        // Clear dropdown and insert filtered makes
         dropdown.innerHTML = "<option value=''>-- Select Make --</option>";
 
         for (var i = 0; i < results.length; i++) {
             var makeName = results[i].Make_Name.toUpperCase();
 
-            // If it's a modern 2024 brand
             for (var j = 0; j < modernMakes.length; j++) {
                 if (makeName === modernMakes[j]) {
-                    dropdown.innerHTML +=
-                        "<option value='" + makeName + "'>" + makeName + "</option>";
+                    dropdown.innerHTML += "<option value='" + makeName + "'>" + makeName + "</option>";
                 }
             }
         }
 
-        if (message)
-            message.innerHTML = "Loaded " + dropdown.options.length + " modern 2024 makes.";
+        if (message) {
+            message.innerHTML = "Loaded " + (dropdown.options.length - 1) + " modern makes.";
+        }
 
     } catch (err) {
-        if (message) message.innerHTML = "Error loading makes.";
         console.log(err);
+        dropdown.innerHTML = "<option>Error loading makes</option>";
+        if (message) message.innerHTML = "Could not load makes.";
     }
 }
 
-// GO TO MODELS PAGE
+// NAVIGATION
 
 function goToModels() {
-    var dropdown = document.getElementById("makeDropdown");
-    var make = dropdown.value;
+    var make = document.getElementById("makeDropdown").value;
 
     if (make === "") {
-        alert("Please select a make first.");
+        alert("Please choose a maker first.");
         return;
     }
 
     window.location.href = "models.html?make=" + make;
-} 
+}
 
-// LOAD ONLY 2024 MODELS
+// LOAD MODELS — with FALLBACK
 
 async function loadModels() {
     var params = new URLSearchParams(window.location.search);
@@ -76,25 +75,39 @@ async function loadModels() {
     var tableBody = document.getElementById("modelsTable");
     var message = document.getElementById("modelsMessage");
 
-    if (!make) {
-        title.innerHTML = "No make selected.";
-        return;
-    }
-
-    title.innerHTML = "Models for: " + make + " (2024)";
+    title.innerHTML = "Models for: " + make;
     tableBody.innerHTML = "";
-    if (message) message.innerHTML = "Loading 2024 models...";
+    if (message) message.innerHTML = "Loading models...";
 
     try {
-        // 🔥 **This endpoint ONLY returns 2024 models**
-        var url =
-            "https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMakeYear/make/" +
-            make +
-            "/modelyear/2024?format=json";
+        // Try 2024 models first
+        var url2024 = 
+          "https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMakeYear/make/" +
+          make + "/modelyear/2024?format=json";
 
-        var response = await fetch(url);
-        var data = await response.json();
-        var results = data.Results;
+        var response2024 = await fetch(url2024);
+        var data2024 = await response2024.json();
+        var results = data2024.Results;
+
+        // If no 2024 results → FALLBACK to classic endpoint
+        if (results.length === 0) {
+            var fallbackUrl = 
+              "https://vpic.nhtsa.dot.gov/api/vehicles/getmodelsformake/" +
+              make + "?format=json";
+
+            var fallbackResponse = await fetch(fallbackUrl);
+            var fallbackData = await fallbackResponse.json();
+            results = fallbackData.Results;
+
+            if (message) {
+                message.innerHTML =
+                    "⚠ No 2024 data found — showing all available models instead.";
+            }
+        } else {
+            if (message) {
+                message.innerHTML = "Loaded " + results.length + " models from 2024.";
+            }
+        }
 
         // Fill table
         for (var i = 0; i < results.length; i++) {
@@ -102,14 +115,11 @@ async function loadModels() {
 
             tableBody.innerHTML +=
                 "<tr>" +
-                "<td>" + m.Model_Name + "</td>" +
-                "<td>" + m.Model_ID + "</td>" +
-                "<td>" + m.Make_ID + "</td>" +
+                    "<td>" + m.Model_Name + "</td>" +
+                    "<td>" + (m.Model_ID || "N/A") + "</td>" +
+                    "<td>" + (m.Make_ID || "N/A") + "</td>" +
                 "</tr>";
         }
-
-        if (message)
-            message.innerHTML = "Found " + results.length + " models.";
 
     } catch (err) {
         console.log(err);
