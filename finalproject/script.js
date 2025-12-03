@@ -1,50 +1,95 @@
-// Load modern car makes (2020–2024)
+// Load ONLY 2024 modern car manufacturers
 async function loadMakes() {
     var dropdown = document.getElementById("makeDropdown");
     var message = document.getElementById("makeMessage");
 
     if (!dropdown) return;
 
-    dropdown.innerHTML = "<option>Loading modern car makes...</option>";
+    dropdown.innerHTML = "<option>Loading 2024 car makes...</option>";
     if (message) message.innerHTML = "";
 
     try {
-        // Years we are combining
-        var years = [2020, 2021, 2022, 2023, 2024];
-        var allMakes = [];        
+        var url = "https://vpic.nhtsa.dot.gov/api/vehicles/GetMakesForManufacturerAndYear/2024?format=json";
 
-        // Fetch each year one at a time
-        for (var i = 0; i < years.length; i++) {
-            var url = "https://vpic.nhtsa.dot.gov/api/vehicles/getallmakes?year=" 
-                      + years[i] + "&format=json";
+        var response = await fetch(url);
+        var data = await response.json();
+        var results = data.Results;
 
-            var response = await fetch(url);
-            var data = await response.json();
+        dropdown.innerHTML = "<option value=''>-- Select a 2024 Make --</option>";
 
-            // Add all results to the list
-            for (var j = 0; j < data.Results.length; j++) {
-                allMakes.push(data.Results[j].Make_Name);
-            }
+        for (var i = 0; i < results.length; i++) {
+            var makeName = results[i].Make;
+            dropdown.innerHTML += "<option value='" + makeName + "'>" + makeName + "</option>";
         }
 
-        // Remove duplicates by turning into a Set, then back to array
-        var uniqueMakes = Array.from(new Set(allMakes));
-
-        // Sort alphabetically
-        uniqueMakes.sort();
-
-        // Clear dropdown and add default
-        dropdown.innerHTML = "<option value=''>-- Select a modern make --</option>";
-
-        // Add all unique makes to dropdown
-        for (var i = 0; i < uniqueMakes.length; i++) {
-            dropdown.innerHTML += "<option value='" + uniqueMakes[i] + "'>" 
-                + uniqueMakes[i] + "</option>";
+        if (message) {
+            message.innerHTML = "Loaded " + results.length + " makes from 2024.";
         }
 
     } catch (error) {
         dropdown.innerHTML = "<option>Error loading makes</option>";
-        if (message) message.innerHTML = "Could not load modern car brands.";
+        if (message) {
+            message.innerHTML = "Could not load 2024 makes.";
+        }
     }
 }
-// the site would keep crashing if I did all the cars so I had to slim the choices down
+
+// Go to models page
+function goToModels() {
+    var make = document.getElementById("makeDropdown").value;
+
+    if (make === "") {
+        alert("Please select a car make.");
+        return;
+    }
+
+    window.location.href = "models.html?make=" + encodeURIComponent(make);
+}
+
+// Load all models for selected make
+async function loadModels() {
+    var title = document.getElementById("makeTitle");
+    var message = document.getElementById("modelsMessage");
+    var tableBody = document.getElementById("modelsTable");
+
+    if (!title) return;
+
+    var params = new URLSearchParams(window.location.search);
+    var make = params.get("make");
+
+    title.innerHTML = "Models for: " + make;
+    if (message) message.innerHTML = "Loading models...";
+
+    try {
+        var url = "https://vpic.nhtsa.dot.gov/api/vehicles/getmodelsformmake/" +
+                  encodeURIComponent(make) + "?format=json";
+
+        var response = await fetch(url);
+        var data = await response.json();
+
+        var results = data.Results;
+        tableBody.innerHTML = "";
+
+        for (var i = 0; i < results.length; i++) {
+            var r = results[i];
+
+            tableBody.innerHTML +=
+                "<tr>" +
+                  "<td>" + r.Model_Name + "</td>" +
+                  "<td>" + r.Model_ID + "</td>" +
+                  "<td>" + r.Make_ID + "</td>" +
+                "</tr>";
+        }
+
+        if (message) {
+            if (results.length === 0) {
+                message.innerHTML = "No models found.";
+            } else {
+                message.innerHTML = "Found " + results.length + " models.";
+            }
+        }
+
+    } catch (error) {
+        if (message) message.innerHTML = "Error loading models.";
+    }
+}

@@ -3,95 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Car Make Explorer</title>
+    <title>Car Make Explorer (2024)</title>
 
-    <!-- Bootstrap CSS from CDN -->
     <link rel="stylesheet"
           href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap">
+
     <style>
         body {
-            background-color: #0a1a2f; /* dark navy */
+            background-color: #0d1b2a;
             color: #ffffff;
+            font-family: 'Poppins', Arial, sans-serif;
         }
 
-        .page-wrapper {
-            margin-top: 30px;
-            margin-bottom: 30px;
+        .navbar-custom {
+            background-color: #1b263b;
+            border-color: #1b263b;
         }
 
-        .panel-box {
-            background-color: #ffffff;
-            color: #333333;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.4);
+        .navbar-custom .navbar-brand {
+            color: #ffffff;
+            font-weight: 600;
         }
 
-        .header-title {
-            margin-bottom: 15px;
+        .card-box {
+            background-color: #1b263b;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
 
-        .subtitle {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        .label-text {
-            margin-top: 15px;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .footer-text {
-            margin-top: 15px;
-            font-size: 12px;
-            color: #dddddd;
+        .btn-rounded {
+            border-radius: 20px;
         }
     </style>
 </head>
 
 <body>
 
-<div class="container page-wrapper">
-
-    <div class="row">
-        <!-- Left side: title + instructions -->
-        <div class="col-md-6 col-sm-12">
-            <h1 class="header-title">Car Make Explorer</h1>
-            <p class="subtitle">
-                This page uses a public car API from NHTSA to load a list of vehicle
-                manufacturers. Pick a make on the right and then click
-                <strong>View Models</strong> to see all models for that brand.
-            </p>
-
-            <ul>
-                <li>Uses a REST API with JSON data.</li>
-                <li>HTML, Bootstrap, and vanilla JavaScript.</li>
-                <li>Responsive layout for phones, tablets, and desktops.</li>
-            </ul>
-
-            <p class="footer-text">
-                Tip: If the list does not load, check your internet connection and refresh the page.
-            </p>
+<nav class="navbar navbar-custom">
+    <div class="container">
+        <div class="navbar-header">
+            <span class="navbar-brand">Car Make Explorer (2024)</span>
         </div>
+    </div>
+</nav>
 
-        <!-- Right side: dropdown + button in a white card -->
-        <div class="col-md-6 col-sm-12">
-            <div class="panel-box">
-                <h3 class="text-center">Select a Car Make</h3>
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
+            <div class="card-box">
 
-                <label for="makeDropdown" class="label-text">Car Make:</label>
+                <h2>Select a 2024 Car Make</h2>
+                <p>Choose a modern manufacturer and view all 2024 models.</p>
+
                 <select id="makeDropdown" class="form-control">
-                    <option>Loading makes...</option>
+                    <option>Loading 2024 car makes...</option>
                 </select>
 
-                <button class="btn btn-primary btn-block" style="margin-top: 15px;"
-                        onclick="goToModels()">
+                <button onclick="goToModels()"
+                        class="btn btn-primary btn-block btn-rounded"
+                        style="margin-top: 15px;">
                     View Models
                 </button>
 
-                <p id="makeMessage" style="margin-top: 10px; font-size: 13px;"></p>
+                <p id="makeMessage" style="margin-top:10px; font-size:13px; color:#cfd6e6;"></p>
+
             </div>
         </div>
     </div>
@@ -99,7 +79,6 @@
 
 <script src="script.js"></script>
 <script>
-    // load the list of makes when the page opens
     loadMakes();
 </script>
 
