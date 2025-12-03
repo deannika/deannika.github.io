@@ -12,28 +12,33 @@
 <body>
 
     <div class="container">
-        <!-- Jumbotron Section -->
-        <div class="jumbotron text-center" style="margin-top: 20px;">
+
+        <!-- Header / Jumbotron -->
+        <div class="jumbotron text-center" style="margin-top: 30px;">
             <h1> Car Make Explorer</h1>
             <p>Find a vehicle brand and explore its models.</p>
         </div>
 
-        <!-- Make Selection -->
+        <!-- Dropdown Section -->
         <div class="text-center">
             <h2>Select a Car Make</h2>
 
-            <select id="makeDropdown" class="form-control" style="max-width: 300px; margin: 0 auto; margin-bottom: 20px;">
+            <select id="makeDropdown" class="form-control"
+                    style="max-width: 300px; margin: 0 auto; margin-bottom: 20px;">
                 <option>Loading...</option>
             </select>
 
-            <button class="btn btn-primary" onclick="goToModels()">View Models</button>
+            <button class="btn btn-primary" onclick="goToModels()">
+                View Models
+            </button>
         </div>
+
     </div>
 
     <script src="script.js"></script>
 
     <script>
-        loadMakes();
+        loadMakes();  // automatically runs when page loads
     </script>
 
 </body>
