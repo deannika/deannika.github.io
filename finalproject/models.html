@@ -2,91 +2,50 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Car Models (2024)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2024 Models</title>
 
-    <link rel="stylesheet"
-          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
-    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 
     <style>
         body {
-            background-color: #0d1b2a;
-            color: #ffffff;
-            font-family: 'Poppins', Arial, sans-serif;
+            background: #0d1b2a;
+            color: white;
+            font-family: Arial, sans-serif;
         }
-
-        .navbar-custom {
-            background-color: #1b263b;
-            border-color: #1b263b;
-        }
-
-        .navbar-custom .navbar-brand {
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        .card-box {
-            background-color: #1b263b;
+        .card {
+            background: #1b263b;
             border-radius: 10px;
             padding: 25px;
-            margin-top: 40px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-        }
-
-        .btn-rounded {
-            border-radius: 20px;
         }
     </style>
-
 </head>
 
-<body>
+<body onload="loadModels()">
 
-<nav class="navbar navbar-custom">
-    <div class="container">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="index.html">Car Make Explorer (2024)</a>
+    <div class="container mt-4">
+        <h2 id="makeTitle" class="text-center mb-4">Loading...</h2>
+
+        <div class="card">
+            <p id="modelsMessage"></p>
+
+            <table class="table table-dark table-striped">
+                <thead>
+                    <tr>
+                        <th>Model Name</th>
+                        <th>Model ID</th>
+                        <th>Make ID</th>
+                    </tr>
+                </thead>
+                <tbody id="modelsTable"></tbody>
+            </table>
+        </div>
+
+        <div class="text-center mt-3">
+            <a href="index.html" class="btn btn-primary">Back</a>
         </div>
     </div>
-</nav>
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-10 col-md-offset-1 col-sm-12">
-            <div class="card-box">
-
-                <h2 id="makeTitle">Car Models</h2>
-                <p id="modelsMessage" style="font-size:13px; color:#cfd6e6;"></p>
-
-                <div class="table-responsive">
-                    <table class="table table-striped table-bordered">
-                        <thead>
-                        <tr>
-                            <th>Model Name</th>
-                            <th>Model ID</th>
-                            <th>Make ID</th>
-                        </tr>
-                        </thead>
-                        <tbody id="modelsTable"></tbody>
-                    </table>
-                </div>
-
-                <a href="index.html" class="btn btn-default btn-rounded">
-                    ← Back to Make Selection
-                </a>
-
-            </div>
-        </div>
-    </div>
-</div>
-
-<script src="script.js"></script>
-<script>
-    loadModels();
-</script>
-
+    <script src="script.js"></script>
 </body>
 </html>
