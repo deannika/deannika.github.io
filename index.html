@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Redirecting…</title>
+
+    <script>
+        // Stop any scripts from running in this old file
+        window.onload = function () {
+            console.log("Root index disabled — redirecting...");
+        };
+
+        // Redirect to the real site
+        setTimeout(function () {
+            window.location.href = "finalproject/index.html";
+        }, 10);
+    </script>
+
+    <style>
+        body {
+            background: #0a1a2f;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Redirecting to Car Make Explorer…</h2>
+    <p>If this page does not redirect, 
+        <a href="finalproject/index.html" style="color: #9cf;">click here</a>.
+    </p>
+</body>
+</html>
